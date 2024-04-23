@@ -44,6 +44,14 @@ def find_horizontal_differences(source: np.ndarray) -> np.ndarray:
 
     # TODO: you write this! (Hint: remember that the ndarrays are (row, col), not (x,y).
 
+    # Suggestion: don't use python loops to find this difference. They're slow. Use numpy to find the difference between
+    #   the source and another array that is the source shifted by one.
+    # There are two approaches to this: a) use np.roll() and then set a column of zeroes in the difference,
+    #   or b) remove the last column from a copy of source, and insert a copy of the first column at the start,
+    #   perhaps using np.hstack().
+    # You'll want to research numpy's roll and hstack (and vstack) and how to remove a column or set a column to a set
+    #   of values.
+
     return result
 
 
@@ -56,6 +64,8 @@ def find_vertical_differences(source: np.ndarray) -> np.ndarray:
     assert(source.dtype == int)
     result: np.ndarray = np.zeros(shape=source.shape, dtype=float)
     # TODO: you write this! (Hint: remember that the ndarrays are (row, col), not (x,y).
+
+    # see the hint in find_horizontal_differences.
 
     return result
 def measure_change_in_image(img_uint8: np.ndarray) -> None:
