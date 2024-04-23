@@ -34,39 +34,10 @@ def load_smooth_and_grey_image() -> None:
     # convert this to black-and-white range 0 to 255 (ints)
     grey_image = cv2.cvtColor(smoothed_image, cv2.COLOR_BGR2GRAY)
 
-
-def measure_change_in_image(img: np.ndarray) -> None:
-    """
-    analyzes the given grayscale image shape (H, W, 1), composed of integers 0-255 to find the change in pixel values
-    in the x-direction, the y-direction, the change magnitude and the angle of change. Creates the following four global
-    variables, with the corresponding shapes, types and ranges:
-
-    • dx_image, dy_image, (H, W, 1) floats -255.0 - +255.0
-    • change_magnitude_image (H, W, 1) floats 0-255.0
-    • change_angle_image (H, W, 1) floats -π - +π
-    :param img:  the grayscale source image.
-    :return: None
-    """
-    global dx_image, dy_image, change_magnitude_image, change_angle_image
-
-    dx_image = find_horizontal_differences(img)   # range will be -255.0 to +255.0
-    dy_image = find_vertical_differences(img)
-
-    # TODO: generate the images, "change_magnitude_image" and "change_angle_image" - the former is the pythagorean
-    #    magnitude of dx and dy at each pixel. The latter is the angle of the triangle formed by dx and dy at each
-    #    pixel.
-    #    Because numpy is soooo handy, it is possible to do these calculations in one line apiece. Make use of the
-    #    following cellwise operators:
-    #    *
-    #    +
-    #    np.sqrt
-    #    np.atan2
-
-
 def find_horizontal_differences(source: np.ndarray) -> np.ndarray:
     """
     Finds the "dx" of the given source... that is the difference between each point and the one to the left of it.
-    :param source: an (N x M x 1) ndarray of range 0-255
+    :param source: an (N x M x 1) ndarray of range 0-255 (but these _are_ signed ints)
     :return:  an (N x M x 1) ndarray of type float (range -255.0 to +255.0)
     """
     result: np.ndarray = np.zeros(shape=source.shape, dtype=float)
@@ -79,14 +50,41 @@ def find_horizontal_differences(source: np.ndarray) -> np.ndarray:
 def find_vertical_differences(source: np.ndarray) -> np.ndarray:
     """
     Finds the "dy" of the given source... that is the difference between each point and the one above it.
-    :param source: an (N x M x 1) ndarray of range 0-255
+    :param source: an (N x M x 1) ndarray of range 0-255 (but these _are_ signed ints)
     :return:  an (N x M x 1) ndarray of type float (range -255.0 to +255.0)
     """
+    assert(source.dtype == int)
     result: np.ndarray = np.zeros(shape=source.shape, dtype=float)
     # TODO: you write this! (Hint: remember that the ndarrays are (row, col), not (x,y).
 
     return result
+def measure_change_in_image(img_uint8: np.ndarray) -> None:
+    """
+    analyzes the given grayscale image shape (H, W, 1), composed of integers 0-255 to find the change in pixel values
+    in the x-direction, the y-direction, the change magnitude and the angle of change. Creates the following four global
+    variables, with the corresponding shapes, types and ranges:
 
+    • dx_image, dy_image, (H, W, 1) floats -255.0 - +255.0
+    • change_magnitude_image (H, W, 1) floats 0-255.0
+    • change_angle_image (H, W, 1) floats -π - +π
+    :param img:  the grayscale source image.
+    :return: None
+    """
+    global dx_image, dy_image, change_magnitude_image, change_angle_image
+    img_int = img_uint8.astype(int)  # convert from unsigned 8-bit integers to signed integers.
+
+    dx_image = find_horizontal_differences(img_int)   # range will be -255.0 to +255.0
+    dy_image = find_vertical_differences(img_int)
+
+    # TODO: generate the images, "change_magnitude_image" and "change_angle_image" - the former is the pythagorean
+    #    magnitude of dx and dy at each pixel. The latter is the angle of the triangle formed by dx and dy at each
+    #    pixel.
+    #    Because numpy is soooo handy, it is possible to do these calculations in one line apiece. Make use of the
+    #    following cellwise operators:
+    #    *
+    #    +
+    #    np.sqrt
+    #    np.atan2
 
 def build_an_edge(magnitude_map, angle_map) -> Optional[Edge]:
     """
